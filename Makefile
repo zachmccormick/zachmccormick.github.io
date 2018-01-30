@@ -56,6 +56,6 @@ publish:
 	git push origin $(GITHUB_PAGES_BRANCH)
 	git add .
 	git commit -m "Updating site"
-	git push origin master
+	git push origin develop
 
 .PHONY: html help clean regenerate serve publish
