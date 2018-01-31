@@ -1,6 +1,6 @@
 Title: Running GeoDjango on Heroku (August 2017)
 Date: 2017-08-16 12:00
-Modified: 2017-08-016 12:00
+Modified: 2017-08-16 12:00
 Category: Programming
 Tags: heroku, django, gis, geography, devops
 Authors: Zach McCormick

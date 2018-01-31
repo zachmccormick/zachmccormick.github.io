@@ -1,0 +1,7 @@
+https://favicon.io/
+Text: z11k
+Shape: rounded
+Font Family: Yellowtail
+Font Size: 90
+Font Color: white
+Background Color: rgb(17, 170, 34)

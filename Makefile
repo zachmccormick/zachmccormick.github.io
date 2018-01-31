@@ -58,4 +58,7 @@ publish:
 	git commit -m "Updating site"
 	git push origin develop
 
-.PHONY: html help clean regenerate serve publish
+post:
+	python scripts/newpost.py
+
+.PHONY: html help clean regenerate serve publish post
