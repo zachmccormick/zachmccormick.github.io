@@ -1,6 +1,6 @@
 Title: Proverbs and Programming
-Date: 2018-01-02 12:00
-Modified: 2018-01-02 12:00
+Date: 2018-01-02
+Modified: 2018-01-02
 Category: Programming
 Tags: proverbs, programming, engineering, teamwork, wisdom
 Authors: Zach McCormick
