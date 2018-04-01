@@ -1,7 +1,12 @@
-feb 28, 2017
-# Tags for com.getsentry.raven for Android
+Title: Tags for Sentry for Android
+Date: 2017-02-28
+Category: Software Development
+Tags: software development, android
+Authors: Zach McCormick
 
-I couldn’t figure out how to add tags or anything to my captured exceptions for Android, which led them to be rather bland/unhelpful when trying to pin down what was causing a bug on the Android camera (notorious for being inconsistent across manufacturers, devices, Android versions, etc.)
+I could not figure out how to add tags or anything to my captured exceptions for Android, which led them to be
+rather bland/unhelpful when trying to pin down what was causing a bug on the Android camera (notorious for being
+inconsistent across manufacturers, devices, Android versions, etc.)
 
 I ended up doing the following, which hopefully helps others!
 
@@ -37,4 +42,5 @@ I ended up doing the following, which hopefully helps others!
       Raven.capture(e);
     }
 
-Obviously you can see the pattern here to add tags using the eventBuilder. I have no idea why this was omitted in the Android version of Raven, but reflection saves the day per usual.
+Obviously you can see the pattern here to add tags using the eventBuilder. I have no idea why this was omitted in
+the Android version of Raven, but reflection saves the day per usual.

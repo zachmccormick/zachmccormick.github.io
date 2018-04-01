@@ -1,5 +1,8 @@
-Oct 27, 2013
-# Where do Android components run?
+Title: Where do Android components run?
+Date: 2013-10-27
+Category: Software Development
+Tags: software development, android
+Authors: Zach McCormick
 
 If you ever wondered where the different Android components run by default:
 
@@ -17,4 +20,5 @@ If you ever wondered where the different Android components run by default:
 
 * Remote-process BroadcastReceiver — always runs in UI/main thread of remote process
 
-Link to GitHub repo with test project used for data: [https://github.com/zachmccormick/AndroidComponentThreads](https://github.com/zachmccormick/AndroidComponentThreads)
+Link to GitHub repo with test project used for data:
+[https://github.com/zachmccormick/AndroidComponentThreads](https://github.com/zachmccormick/AndroidComponentThreads)
