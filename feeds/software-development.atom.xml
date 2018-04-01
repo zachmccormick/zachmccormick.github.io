@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Thoughts and Discoveries of z11k - Software Development</title><link href="http://z11k.com/" rel="alternate"></link><link href="http://z11k.com/feeds/software-development.atom.xml" rel="self"></link><id>http://z11k.com/</id><updated>2017-08-16T00:00:00-04:00</updated><entry><title>Running GeoDjango on Heroku (August 2017)</title><link href="http://z11k.com/posts/2017/08/running-geodjango-on-heroku-august-2017/" rel="alternate"></link><published>2017-08-16T00:00:00-04:00</published><updated>2017-08-16T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2017-08-16:/posts/2017/08/running-geodjango-on-heroku-august-2017/</id><summary type="html">&lt;h3 id="heroku-setup"&gt;Heroku Setup&lt;/h3&gt;
+&lt;p&gt;There are currently two ways to get the GDAL, GEOS, and PROJ libraries needed by GeoDjango onto your Heroku slug&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Via a custom buildpack
+(&lt;a href="https://github.com/cyberdelia/heroku-geo-buildpack"&gt;https://github.com/cyberdelia/heroku-geo-buildpack&lt;/a&gt;) 1.
+Via setting the environment variable BUILD_WITH_GEO_LIBRARIES=1 while using the default Python buildpack&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This has two issues as …&lt;/p&gt;</summary><content type="html">&lt;h3 id="heroku-setup"&gt;Heroku Setup&lt;/h3&gt;
+&lt;p&gt;There are currently two ways to get the GDAL, GEOS, and PROJ libraries needed by GeoDjango onto your Heroku slug&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Via a custom buildpack
+(&lt;a href="https://github.com/cyberdelia/heroku-geo-buildpack"&gt;https://github.com/cyberdelia/heroku-geo-buildpack&lt;/a&gt;) 1.
+Via setting the environment variable BUILD_WITH_GEO_LIBRARIES=1 while using the default Python buildpack&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This has two issues as of 8–16–2017: The current “stack” on Heroku is heroku-16.  This stack
+does not properly copy over libjasper, which is a required linked library by libgdal. One solution is
+to set your stack to cedar-14 instead.  Another solution is to use a slightly modified custom buildpack
+(&lt;a href="https://github.com/dschep/heroku-geo-buildpack"&gt;https://github.com/dschep/heroku-geo-buildpack&lt;/a&gt;)
+or a slightly modified offical buildpack
+([https://github.com/TrailblazingTech/heroku-buildpack-python#fix-gdal-jasper]
+(https://github.com/TrailblazingTech/heroku-buildpack-python#fix-gdal-jasper)).&lt;/p&gt;
+&lt;p&gt;If you stick with the heroku-16 stack, you’ll want to add the following to your settings.py:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;GDAL_LIBRARY_PATH = os.getenv(‘GDAL_LIBRARY_PATH’)&lt;br&gt; GEOS_LIBRARY_PATH = &amp;gt; os.getenv(‘GEOS_LIBRARY_PATH’)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Then, if using the official Python buildpack, you will want to set your environment variables like so:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;GDAL_LIBRARY_PATH=/app/.heroku/vendor/lib/libgdal.so&lt;br&gt; &amp;gt; GEOS_LIBRARY_PATH=/app/.heroku/vendor/lib/libgeos_c.so&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This may be required as well on cedar-14 — I didn’t take notes during that part of the struggle :-)&lt;/p&gt;
+&lt;h3 id="django-settings-changes"&gt;Django Settings Changes&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Add ‘django.contrib.gis’ to your INSTALLED_APPS 1.  Change your DATABASES dict to use postgis, like so:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;DATABASES[‘default’] = dj_database_url.config(conn_max_age=600,&lt;br&gt; &amp;gt;
+default=’postgis://localhost:5432/{}’.format(APP_NAME))&lt;br&gt;  # VERY IMPORTANT BECAUSE HEROKU WILL USE
+‘postgres’ AS THE SCHEME&lt;br&gt; DATABASES[‘default’][‘ENGINE’] = ‘django.contrib.gis.db.backends.postgis’&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="other-django-things"&gt;Other Django Things&lt;/h3&gt;
+&lt;p&gt;In urls.py, change &lt;strong&gt;from django.contrib import admin&lt;/strong&gt; to &lt;strong&gt;from django.contrib.gis import admin&lt;/strong&gt; for admin urls&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;In whatever app makes sense, add the following migration:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;from django.contrib.postgres.operations import CreateExtension&lt;br&gt; from &amp;gt; django.db import migrations&lt;/p&gt;
+&lt;p&gt;class Migration(migrations.Migration):&lt;br&gt;  operations = [&lt;br&gt; &amp;gt; CreateExtension(‘postgis’)&lt;br&gt;  ]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="credits"&gt;Credits&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://twitter.com/cyberdelia"&gt;cyberdelia&lt;/a&gt; and &lt;a href="http://twitter.com/dschep"&gt;dschep&lt;/a&gt; on GitHub for helping provide
+and work through the gdal dependency issues with a custom buildpack.&lt;/p&gt;
+&lt;h3 id="github-example"&gt;GitHub Example&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://github.com/TrailblazingTech/django-gis-heroku"&gt;https://github.com/TrailblazingTech/django-gis-heroku&lt;/a&gt;&lt;/p&gt;</content><category term="heroku"></category><category term="django"></category><category term="gis"></category><category term="geography"></category><category term="devops"></category></entry><entry><title>Tags for Sentry for Android</title><link href="http://z11k.com/posts/2017/02/tags-for-sentry-for-android/" rel="alternate"></link><published>2017-02-28T00:00:00-05:00</published><updated>2017-02-28T00:00:00-05:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2017-02-28:/posts/2017/02/tags-for-sentry-for-android/</id><summary type="html">&lt;p&gt;I could not figure out how to add tags or anything to my captured exceptions for Android, which led them to be
+rather bland/unhelpful when trying to pin down what was causing a bug on the Android camera (notorious for being
+inconsistent across manufacturers, devices, Android versions, etc.)&lt;/p&gt;
+&lt;p&gt;I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I could not figure out how to add tags or anything to my captured exceptions for Android, which led them to be
+rather bland/unhelpful when trying to pin down what was causing a bug on the Android camera (notorious for being
+inconsistent across manufacturers, devices, Android versions, etc.)&lt;/p&gt;
+&lt;p&gt;I ended up doing the following, which hopefully helps others!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;com.getsentry.raven.android.Raven&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;com.getsentry.raven.event.EventBuilder&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;com.getsentry.raven.event.helper.EventBuilderHelper&lt;/span&gt;
+
+&lt;span class="o"&gt;...&lt;/span&gt;
+
+&lt;span class="n"&gt;Raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getApplicationContext&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+&lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;Field&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;class&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getDeclaredField&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;raven&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setAccessible&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;true&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getsentry&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Raven&lt;/span&gt; &lt;span class="n"&gt;raven&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getsentry&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Raven&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;class&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;final&lt;/span&gt; &lt;span class="n"&gt;ConnectivityManager&lt;/span&gt; &lt;span class="n"&gt;connManager&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ConnectivityManager&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;getSystemService&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;CONNECTIVITY_SERVICE&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;final&lt;/span&gt; &lt;span class="n"&gt;NetworkInfo&lt;/span&gt; &lt;span class="n"&gt;mWifi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;connManager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getNetworkInfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ConnectivityManager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;TYPE_WIFI&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;final&lt;/span&gt; &lt;span class="n"&gt;PackageInfo&lt;/span&gt; &lt;span class="n"&gt;pInfo&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getPackageManager&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getPackageInfo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getPackageName&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);;&lt;/span&gt;
+  &lt;span class="n"&gt;raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;addBuilderHelper&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt; &lt;span class="n"&gt;EventBuilderHelper&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nd"&gt;@Override&lt;/span&gt;&lt;span class="p"&gt;](&lt;/span&gt;&lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;//&lt;/span&gt;&lt;span class="n"&gt;twitter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;com&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Override&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;public&lt;/span&gt; &lt;span class="n"&gt;void&lt;/span&gt; &lt;span class="n"&gt;helpBuildingEvent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;EventBuilder&lt;/span&gt; &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;wifi&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;valueOf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mWifi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;isConnected&lt;/span&gt;&lt;span class="p"&gt;()));&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;app_version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pInfo&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;versionName&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;build_version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VERSION&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RELEASE&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;build_manufacturer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MANUFACTURER&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;build_brand&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;BRAND&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;build_device&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DEVICE&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;build_product&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;PRODUCT&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;debug_app&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;BuildConfig&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="err"&gt;?&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;true&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;false&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;eventBuilder&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;withTag&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;build_brand&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Build&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;BRAND&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="n"&gt;catch&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;Raven&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;capture&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Obviously you can see the pattern here to add tags using the eventBuilder. I have no idea why this was omitted in
+the Android version of Raven, but reflection saves the day per usual.&lt;/p&gt;</content><category term="software development"></category><category term="android"></category></entry><entry><title>GitHub Fork and PR Model — “Unknown Repository”</title><link href="http://z11k.com/posts/2016/04/github-fork-and-pr-model-unknown-repository/" rel="alternate"></link><published>2016-04-21T00:00:00-04:00</published><updated>2016-04-21T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2016-04-21:/posts/2016/04/github-fork-and-pr-model-unknown-repository/</id><summary type="html">&lt;p&gt;Have you ever had a PR that you can’t quite merge because it needs changes, but the user has gone away (either
+deleted their account/branch/fork or are no longer a collaborator on a project)? Do you see “unknown repository”
+when you pull up the PR on GitHub …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Have you ever had a PR that you can’t quite merge because it needs changes, but the user has gone away (either
+deleted their account/branch/fork or are no longer a collaborator on a project)? Do you see “unknown repository”
+when you pull up the PR on GitHub?&lt;/p&gt;
+&lt;p&gt;Fear no more — you can salvage that code! Add the following line to the origin block (or whatever remote you
+are using — be sure to change to refs/remotes/REMOTE/pr/*) in /.git/config.&lt;/p&gt;
+&lt;p&gt;fetch = +refs/pull/&lt;em&gt;/head:refs/remotes/origin/pr/&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Then you can do git checkout pr/### to grab their code, then git checkout -b my-new-branch to create a local branch
+out of the once-lost PR!&lt;/p&gt;
+&lt;p&gt;Pretty neat, eh?&lt;/p&gt;</content><category term="software development"></category><category term="git"></category><category term="github"></category></entry><entry><title>Docker, Ubuntu 14.04, and apt-show-versions</title><link href="http://z11k.com/posts/2015/10/docker-ubuntu-1404-and-apt-show-versions/" rel="alternate"></link><published>2015-10-14T00:00:00-04:00</published><updated>2015-10-14T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2015-10-14:/posts/2015/10/docker-ubuntu-1404-and-apt-show-versions/</id><summary type="html">&lt;p&gt;If you’re using docker and the ubuntu:14.04 image (and possibly other images as well), then you’ll want to
+follow the following steps to get apt-show-versions to work, which is an essential tool if you want perfectly
+reproducible builds/deploys (so that you can figure out exactly …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you’re using docker and the ubuntu:14.04 image (and possibly other images as well), then you’ll want to
+follow the following steps to get apt-show-versions to work, which is an essential tool if you want perfectly
+reproducible builds/deploys (so that you can figure out exactly what versions to provide to apt-get!)&lt;/p&gt;
+&lt;p&gt;If you first install apt-show-versions and get something like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Errors were encountered while processing:
+apt-show-versions
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then if you try to run it and get:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@docker-host:/# apt-show-versions python3
+Error: No information about packages! (Maybe no deb entries?)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It’s likely that the ubuntu:14.04 docker image has taken some space-saving shortcuts that won’t allow
+apt-show-versions to read the dpkg index. Let’s fix that!&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@docker-host:/# rm /etc/apt/apt.conf.d/docker-gzip-indexes
+root@docker-host:/# apt-get update
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That should fix it! Next time you run &lt;code&gt;apt-show-versions&lt;/code&gt; it should work just fine!&lt;/p&gt;</content><category term="software development"></category><category term="docker"></category><category term="ubuntu"></category></entry><entry><title>Benchmarking Django Model Saving</title><link href="http://z11k.com/posts/2015/07/benchmarking-django-model-saving/" rel="alternate"></link><published>2015-07-07T00:00:00-04:00</published><updated>2015-07-07T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2015-07-07:/posts/2015/07/benchmarking-django-model-saving/</id><summary type="html">&lt;p&gt;When using Django’s ORM as a basis for data harvesting (probably not the best idea in the first place, but
+sometimes it’s easier to go with what you know), I learned that Django isn’t exactly crazy fast when saving
+models to the database. Here are some stats …&lt;/p&gt;</summary><content type="html">&lt;p&gt;When using Django’s ORM as a basis for data harvesting (probably not the best idea in the first place, but
+sometimes it’s easier to go with what you know), I learned that Django isn’t exactly crazy fast when saving
+models to the database. Here are some stats on doing different things with Django to try to speed it up.&lt;/p&gt;
+&lt;p&gt;First, I wrote two methods and used cProfile to profile them. MyModel is a model with a single max_length=100
+CharField.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;def benchmark():
+ for i in range(1, 10000): x = MyModel(data=”Some Random Data”) x.save()
+
+def benchmark_bulk():
+ items = [] for i in range(1, 10000): x = MyModel(data=”Some Random Data”) items.append(x)
+ MyModel.objects.bulk_create(items)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I used cProfile to profile these methods, using SQLite as the backing database. benchmark() took 14.87 seconds,
+and benchmark_bulk() took 0.400 seconds. Obvious improvement there by using bulk_create, but you can’t use FKs
+to link subrecords to the records, as the pk property of those objects will not get set.&lt;/p&gt;
+&lt;p&gt;When switching to MySQL: 8.09 seconds on benchmark() and 0.379 seconds on benchmark_bulk(). A little bit better
+— definitely better on benchmark, but not that much better when bulk inserting.&lt;/p&gt;
+&lt;p&gt;When switching to Postgres: 6.71 seconds on benchmark() and 0.385 seconds on benchmark_bulk(). Even faster on
+benchmark, but not any faster for bulk insertion. Bulk insertion may be effectively capped out on speed. The
+bulk_create method on query.py seems to take about .2 seconds no matter the backend.&lt;/p&gt;
+&lt;p&gt;Switching to Cassandra led to bulk_create not working, and benchmark() took 17.88 seconds! That wasn’t what
+I expected here! Looking at the profiler stats, it seems it spent 11.63 seconds in time.sleep(), so maybe I’m
+doing something wrong — subtracting these two gives 6.25 seconds, which is closer to what I’d expect.&lt;/p&gt;
+&lt;p&gt;Obviously the use cases here are very simple, but for simple model insertion speed, Postgres seems to win if
+you want a relational database and migrating to new software isn’t hard. If you don’t want to use Postgres
+(in our case, we like MySQL), or you need intense speedups, then modify your code to use bulk_create()!&lt;/p&gt;
+&lt;p&gt;I’ll make another post later this week or next week, with a more complicated, real-world data structure, and show
+how (likely) Cassandra would beat out both MySQL and Postgres for saving more complex models quickly, since we can
+eliminate FK relationships and save objects in a more NoSQL fashion. This comes at a querying and filtering cost,
+so I’ll examine those too!&lt;/p&gt;</content><category term="software development"></category><category term="django"></category><category term="benchmarking"></category><category term="databases"></category></entry><entry><title>Wrestling with Python on OS X (Yosemite)</title><link href="http://z11k.com/posts/2015/03/wrestling-with-python-on-os-x-yosemite/" rel="alternate"></link><published>2015-03-01T00:00:00-05:00</published><updated>2015-03-01T00:00:00-05:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2015-03-01:/posts/2015/03/wrestling-with-python-on-os-x-yosemite/</id><summary type="html">&lt;p&gt;So I have been using my Macbook Pro for about 3 years for various projects, mostly in Java/Android, some Node here
+and there, I’ve installed Ruby and RVM for whatever reason once or twice, and I probably have 8 version of Python
+installed. I started to work on …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So I have been using my Macbook Pro for about 3 years for various projects, mostly in Java/Android, some Node here
+and there, I’ve installed Ruby and RVM for whatever reason once or twice, and I probably have 8 version of Python
+installed. I started to work on an open source Python project that I’d been working on (started on a different
+computer), and noticed some funky things about my Python install on my MBP. I was constantly getting errors like
+the following when I tried to install virtualenv and virtualenvwrapper:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;IOError: [Errno 13] Permission denied: ‘/usr/local/bin/virtualenv’&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Obviously at some point in time, over a few version of OSX and lots of Homebrewing, I’d screwed up my
+permissions. Let’s fix it!&lt;/p&gt;
+&lt;p&gt;First I went ahead and did a ‘brew update &amp;amp;&amp;amp; brew upgrade’. I then did a ‘brew uninstall python3’ and ‘brew
+uninstall python’ just to clean everything up — that way I’d only have the OS X Yosemite default system Python
+installed. Next I reinstalled Python (2.7.9 when I did it) with ‘brew install python — framework’. Homebrewed
+Python comes with pip, so I did ‘pip list’. Hmmm…. that’s funny! I have a ton of crap listed as installed,
+but I definitely just did a clean install.&lt;/p&gt;
+&lt;p&gt;It turns out that pip will look in a number of different folders, ‘/Library/Python/2.7/site-packages/’ being
+one of them. All of the packages I had installed previously using the system Python, such as awscli and goobook,
+were all sitting here. The Homebrewed version of pip is listing them though. This definitely isn’t what I want…&lt;/p&gt;
+&lt;p&gt;I did an ‘ls’ in the ‘/Library/Python/2.7/site-packages/’ folder and did a ‘sudo pip uninstall xyz’
+for every folder such as ‘xyz-1.2.3’ in that directory, excluding pip and setuptools. I then did a ‘sudo rm
+-rf’ for the pip and setuptools folders in this directory (just to make sure they don’t cause problems). This
+left me with only easy_install.py and pkg_resources.py in that directory.&lt;/p&gt;
+&lt;p&gt;Now let’s install virtualenv. ‘pip install virtualenv’ and ‘pip install virtualenvwrapper’
+now both work perfectly without needing to use ‘sudo’ in front, because pip is attempting to install
+everything and link against existing packages in ‘/usr/local/lib/python2.7/site-packages’ instead of in
+‘/Library/Python/2.7/site-packages’. Yay! That’s exactly what we want. I reinstalled awscli and other
+Python tools that I had gotten used to using, and pip installed them all correctly into the Homebrewed Python’s
+site-packages folder and linked all executables to ‘/usr/local/bin’. Exactly what we want to make it modular
+and manageable, and especially not to require ‘sudo’. Great success!&lt;/p&gt;</content><category term="software development"></category><category term="osx"></category><category term="macos"></category><category term="python"></category><category term="virtualenv"></category></entry><entry><title>Self-Extracting Bash Patcher</title><link href="http://z11k.com/posts/2014/02/self-extracting-bash-patcher/" rel="alternate"></link><published>2014-02-16T00:00:00-05:00</published><updated>2014-02-16T00:00:00-05:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2014-02-16:/posts/2014/02/self-extracting-bash-patcher/</id><summary type="html">&lt;p&gt;Hey all,&lt;/p&gt;
+&lt;p&gt;I haven’t posted anything cool in a while, so here is a cool bash shell script I wrote a while back to generate
+a self-extracting patch (specifically for source code repos). It uses diff to generate output that can be fed into
+patch, then uses grep and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hey all,&lt;/p&gt;
+&lt;p&gt;I haven’t posted anything cool in a while, so here is a cool bash shell script I wrote a while back to generate
+a self-extracting patch (specifically for source code repos). It uses diff to generate output that can be fed into
+patch, then uses grep and sed to do some formatting as well as find all of the binary files that differ. The file
+list is piped to tar and gzipped, then the whole thing is jammed into a single, self-extracting bash script with
+the ability to do an initial dry run, as well as to revert all of the changes. I’ve found that sending entire
+source trees (20+ GB across 300+ git repos) can be inefficient if the recipient has the original code (he/she just
+needs your changes) — sending a 100 MB patch file is much easier!&lt;/p&gt;
+&lt;p&gt;Here it is below — let me know if you can think of anything to improve it! You can also check it out or fork it
+on GitHub!&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://github.com/zachmccormick/PatchGenerator"&gt;https://github.com/zachmccormick/PatchGenerator&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Here is a link to the original article that I read a while back when I was first interested in
+making self-extracting bash scripts.  &lt;a href="http://www.linuxjournal.com/node/1005818"&gt;&lt;strong&gt;Bash Self-Extracting Script | Linux Journal&lt;/strong&gt; &lt;em&gt;In this post
+I'll show you how to create a self extracting bash script to automate the installation of files on
+your…&lt;/em&gt;www.linuxjournal.com&lt;/a&gt;&lt;/p&gt;</content><category term="software development"></category><category term="github"></category><category term="open-source"></category></entry><entry><title>Where do Android components run?</title><link href="http://z11k.com/posts/2013/10/where-do-android-components-run/" rel="alternate"></link><published>2013-10-27T00:00:00-04:00</published><updated>2013-10-27T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2013-10-27:/posts/2013/10/where-do-android-components-run/</id><summary type="html">&lt;p&gt;If you ever wondered where the different Android components run by default:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Activity — always runs in UI/main thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local-process Service — runs on invoking thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local-process ContentProvider — runs on invoking thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remote-process ContentProvider — runs on a thread in a thread pool on remote application process&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remote-process (AIDL) Service — runs on …&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;If you ever wondered where the different Android components run by default:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Activity — always runs in UI/main thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local-process Service — runs on invoking thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local-process ContentProvider — runs on invoking thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remote-process ContentProvider — runs on a thread in a thread pool on remote application process&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remote-process (AIDL) Service — runs on a thread in a thread pool on remote application process&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Local-process BroadcastReceiver — always runs in UI/main thread&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Remote-process BroadcastReceiver — always runs in UI/main thread of remote process&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Link to GitHub repo with test project used for data:
+&lt;a href="https://github.com/zachmccormick/AndroidComponentThreads"&gt;https://github.com/zachmccormick/AndroidComponentThreads&lt;/a&gt;&lt;/p&gt;</content><category term="software development"></category><category term="android"></category></entry><entry><title>Anonymous Shared Memory Library</title><link href="http://z11k.com/posts/2013/10/anonymous-shared-memory-library/" rel="alternate"></link><published>2013-10-02T00:00:00-04:00</published><updated>2013-10-02T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2013-10-02:/posts/2013/10/anonymous-shared-memory-library/</id><summary type="html">&lt;p&gt;I created an Android Library project that supplies you with an AshmemBuffer object, that you can pass between
+processes/applications via a service. Unfortunately, even though it is parcelable, you can’t pass it via an
+Intent because Android doesn’t let you do that (it uses file descriptors under …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I created an Android Library project that supplies you with an AshmemBuffer object, that you can pass between
+processes/applications via a service. Unfortunately, even though it is parcelable, you can’t pass it via an
+Intent because Android doesn’t let you do that (it uses file descriptors under the hood).&lt;/p&gt;
+&lt;p&gt;It has IO functions such as “writeByte”, “writeBytes”, “readByte”, and “readBytes”, with functions
+for setting the pointer and getting the capacity. I plan to add more things later if anyone finds it useful. I just
+wanted to make something cool so that people could use ashmem at the Java layer without having to mess around with
+system calls/C/JNI/etc.&lt;/p&gt;
+&lt;p&gt;Find it here: &lt;a href="https://github.com/zachmccormick/AshmemLibrary"&gt;https://github.com/zachmccormick/AshmemLibrary&lt;/a&gt;&lt;/p&gt;</content><category term="software development"></category><category term="android"></category></entry></feed>

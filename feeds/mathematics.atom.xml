@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Thoughts and Discoveries of z11k - Mathematics</title><link href="http://z11k.com/" rel="alternate"></link><link href="http://z11k.com/feeds/mathematics.atom.xml" rel="self"></link><id>http://z11k.com/</id><updated>2013-04-01T00:00:00-04:00</updated><entry><title>Quant Interview Questions (part 3)</title><link href="http://z11k.com/posts/2013/04/quant-interview-questions-part-3/" rel="alternate"></link><published>2013-04-01T00:00:00-04:00</published><updated>2013-04-01T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2013-04-01:/posts/2013/04/quant-interview-questions-part-3/</id><summary type="html">&lt;p&gt;I should be studying for a math test right now, but my brain needs a break from groups, subgroups, factor groups,
+rings, and fields (for my test on Wednesday) and from almost linear systems of differential equations and matrix
+exponentiation (for my test tomorrow morning), so here are the details …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I should be studying for a math test right now, but my brain needs a break from groups, subgroups, factor groups,
+rings, and fields (for my test on Wednesday) and from almost linear systems of differential equations and matrix
+exponentiation (for my test tomorrow morning), so here are the details of another one of my interviews!&lt;/p&gt;
+&lt;p&gt;This one was definitely more computer science-y than the rest.&lt;/p&gt;
+&lt;h3 id="question"&gt;Question&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Implement a heap data structure with the following methods that run in the following amounts of time, prove
+their runtime, and meet the extra specifications:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Create heap in constant time&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Add a new element in log(n) time&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Retrieve the minimum element in constant time&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Remove the minimum element in log(n) time&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Data structure must be entirely immutable&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Data structure must be a balanced binary heap&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="answer"&gt;Answer&lt;/h3&gt;
+&lt;p&gt;I started out with no immediate idea how to do this in an immutable way, so I just went ahead and started out with
+a static create() method (I did this in Java) that returned a HeapNode&lt;T&gt; object. It was obviously constant time.&lt;/p&gt;
+&lt;p&gt;I knew that I needed to make a min-heap, so I went ahead and started on the add() method. I either set the left-child
+pointer to a new HeapNode containing the Object to be added if it didn’t have a left child, or I called add()
+recursively on the left child. Likewise for the right — for now I chose randomly. I explained to the interviewer
+that I knew it needed to be balanced, but I’d go back to that after I had the basic methods done first.&lt;/p&gt;
+&lt;p&gt;Retrieve in constant time was easy — obviously you are just returning the Object held by the top HeapNode.&lt;/p&gt;
+&lt;p&gt;Removing the minimum element in log(n) time was a bit harder. I remembered my algorithms/discrete structures
+classes though, and knew you just needed to “bubble down” much like you do with add(), so I wrote the code
+to move the furthest-down node to the top, then keep swapping it with lower elements until the heap property was
+fulfilled. Again, I knew that it needed to be immutable and balanced, but I wanted a working heap first.&lt;/p&gt;
+&lt;p&gt;Now that I had the 3 main methods of my heap finished, I worked on the balanced part. I decided that each node should
+keep track of the number of its left and right children. This works perfectly instead of my random approach from
+before for add(), so I went ahead and changed this. As for remove(), I had to go back and change this to bubble
+down to keep it balanced (remove the top node and replace it with the top node of the left or right subtree —
+whichever has more elements, then swap recursively to maintain heap structure).&lt;/p&gt;
+&lt;p&gt;Now, about 45 minutes into the interview, I had the correct methods commented with very terse proofs of runtime,
+but without the immutability property. After pondering aloud for a couple of minutes about it, the interviewer
+gave me some sort of advice (I don’t remember exactly since the interview was over a month ago), and, due to
+lack of time, I explained how I would implement the immutability:&lt;/p&gt;
+&lt;h3 id="the-cool-part"&gt;“The Cool Part**”&lt;/h3&gt;
+&lt;p&gt;** denotes my personal opinion!&lt;/p&gt;
+&lt;p&gt;Think about a min heap with elements (from top to bottom and left to right) 12, 7, 9. To insert 8, you will
+create a heap that looks like 12, 8, 9, 7 (where 12 is on the 0th row, 8 and 9 are on the 1st row, and 7 on the
+2nd row). You might immediately think, “Oh, I need to swap the left-child pointer on 12 to 8, then point 8’s
+left-child pointer to 7.” This is correct for a mutable heap, but I need to preserve the original heap.&lt;/p&gt;
+&lt;p&gt;To preserve both heaps, instead create a new HeapNode with 12 as the element. Next, decide if you are going to add
+to the left or right subtree (you know the sizes). If you are going to add to the left, then set the right-child
+pointer of the new HeapNode to the original HeapNode containing 9. Next, at 7, you decide if 8 will replace 7 or
+descend — it is greater, so it replaces 7, so go ahead and create a new HeapNode with 8 inside, and point your
+new HeapNode with 12’s left-child pointer to this new HeapNode with 8 inside. Finally, create a new HeapNode
+with 7 inside, and point this new HeapNode with 8’s left-child pointer to this node. Return the new HeapNode
+with 12 as the element, and you now have a pointer to the old, still-the-same heap, and the new, changed heap too.&lt;/p&gt;
+&lt;p&gt;Notice that we have changed NONE of the pointers in the original heap, thus we have achieved immutability. We
+only created 3 new nodes (since for the right subtree, we just pointed the new root to the old right subtree),
+which is still log(n) time for our heap.&lt;/p&gt;
+&lt;p&gt;You can continue this process of creating new branches in log(n) time, and while you may generate an ugly looking
+diagram of pointers if you draw it out, you achieve immutability even with the runtime requirements.&lt;/p&gt;
+&lt;p&gt;I’ll leave the remove() method in an immutable way as an exercise to the reader!&lt;/p&gt;
+&lt;h3 id="sad-news"&gt;Sad News&lt;/h3&gt;
+&lt;p&gt;I couldn’t quite meet all of these requirements in the 50 minutes or so I was allotted, so I unfortunately did not
+get the job. I admit fully that I came to this interview less prepared than the other ones (the other 3 interviews,
+I had studied at least 30 hours the week prior to each one; and for the whole set of interviews, I had probably studied
+probability, combinatorics, data structures, and algorithms for about 200 hours from November through February).&lt;/p&gt;
+&lt;p&gt;I am still very interested in computational finance, and may apply to some of these firms again in the future
+post-PhD, as I think it would be thrilling to work on “the street” with some of the greatest mathematicians
+alive, but for now, I’ll focus more on my research!&lt;/p&gt;</content><category term="mathematics"></category><category term="software development"></category></entry><entry><title>Quant Interview Questions (part 2)</title><link href="http://z11k.com/posts/2013/03/quant-interview-questions-part-2/" rel="alternate"></link><published>2013-03-18T00:00:00-04:00</published><updated>2013-03-18T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2013-03-18:/posts/2013/03/quant-interview-questions-part-2/</id><summary type="html">&lt;p&gt;Here is another interview question from a separate interview with the same firm:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“Given the results of a round-robin tournament, can you always create a list of teams ordered such that, when
+looking at a single team, the team to its left won against them, and the team to its …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Here is another interview question from a separate interview with the same firm:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“Given the results of a round-robin tournament, can you always create a list of teams ordered such that, when
+looking at a single team, the team to its left won against them, and the team to its right was beaten by them?&lt;/strong&gt;”&lt;/p&gt;
+&lt;h3 id="clarification"&gt;Clarification&lt;/h3&gt;
+&lt;p&gt;A round-robin tournament, for those who are not familiar with the term, is a tournament where every team plays
+every other team once. For example, if you had 16 teams, then each team would play 15 games — one game against
+every other team. A concrete example of this question can be stated: 4 teams play a round robin tournament, team
+1 beats all of the teams, team 2 beats teams 3 and 4, and team 3 beats team 4. A correct ordering would be [1,2,3,4].&lt;/p&gt;
+&lt;h3 id="proof-strategy"&gt;Proof Strategy&lt;/h3&gt;
+&lt;p&gt;Looking at this problem, my strategy was first to prove it was not impossible with a small number of teams (4
+for instance as above), then come up with a strategy from there. It immediately became apparent after giving one
+concrete case that I could do this quickly and succinctly through a proof by induction.&lt;/p&gt;
+&lt;h3 id="induction"&gt;Induction&lt;/h3&gt;
+&lt;p&gt;Base Case The base cases could be n=0. A tournament of 0 teams has a sequence of no elements and is properly
+ordered. Next, we can try n=1, which has a sequence of one element and is properly ordered. Next, we can look at n=2
+and we start to see what our inductive step is going to look like. With n=2, either team 1 beat team 2, or team 2
+beat team 1, giving us two orderings: [1,2] or [2,1] respectively.  Inductive Hypothesis The inductive hypothesis
+is that we have a tournament of n teams with a properly ordered sequence. Essentially, as in any inductive proof,
+we assume that this situation exists (we have shown it for n=0, 1, and 2, so it must exist for at least 3 values
+of n).  Inductive Step The inductive step is to look at the situation of n+1 teams. Consider our original n teams,
+with a correctly ordered sequence such as [1, 2, 3, …, n-1, n]. When we add team n+1, let us first prepend it
+to the front of the sequence, so we have [n+1, 1, 2, 3, …, n-1, n].&lt;/p&gt;
+&lt;p&gt;If team n+1 beat team 1, then we have a satisfactory ordering, because the subsequence [1, 2, 3, …, n-1, n]
+must still be correct, and the introduced relationship of team n+1 beating team 1 is correct.&lt;/p&gt;
+&lt;p&gt;If team n+1 lost to team 1, then try moving it one position to the right, to get [1, n+1, 2, 3, …, n-1, n]. If team
+n+1 beat team 2, then we have a satisfactory ordering, because it lost to team 1, beat team 2, and the subsequence
+[2, 3, …, n-1, n] must still be correct.&lt;/p&gt;
+&lt;p&gt;If team n+2 lost to team 2, then continue moving it to the right. Continue this process until a correct sequence
+is found, or until you reach the end of the list. If team n+1 reaches the end of the list, then it must have lost
+to team n, thus the subsequence [1, 2, 3, …, n-1, n] must be correct and the introduced relationship of team
+n+1 losing to team n is correct, thus the ordering must be correct.&lt;/p&gt;
+&lt;p&gt;Conclusion Thus, we have proven that it is ALWAYS possible to order a round-robin tournament as such. Generating such
+an ordering using this method would take O(n²) time. On further consideration of generating this ordering given this
+data, it became apparent that one could adapt merge-sort to reduce this sequence generation to O(n log n) time. Due
+to this being a comparison sort, this is absolutely the best we can do (maybe I’ll prove this another time!).&lt;/p&gt;</content><category term="mathematics"></category><category term="software development"></category></entry><entry><title>Quant Interview Questions (part 1)</title><link href="http://z11k.com/posts/2013/03/quant-interview-questions-part-1/" rel="alternate"></link><published>2013-03-14T00:00:00-04:00</published><updated>2013-03-14T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2013-03-14:/posts/2013/03/quant-interview-questions-part-1/</id><summary type="html">&lt;p&gt;I finally have a free moment (I should be doing work, but I don’t have any crazy deadlines to meet today),
+so I thought I would start posting the questions and answers to one of my recent job interviews, as I found them
+incredibly interesting and thought provoking. In …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I finally have a free moment (I should be doing work, but I don’t have any crazy deadlines to meet today),
+so I thought I would start posting the questions and answers to one of my recent job interviews, as I found them
+incredibly interesting and thought provoking. In fact, I would say that their interview process rekindled a love
+of mathematics that I once had, and lost in high school due to the sheer amount of busywork I was made to do in
+the “accelerated track” at my school.&lt;/p&gt;
+&lt;h3 id="background"&gt;Background&lt;/h3&gt;
+&lt;p&gt;I interviewed for a developer position at one of the top quantitative/proprietary trading firms out there, and thus
+they are looking for the cream of the crop in terms of quantitative reasoning and programming ability. I had four
+interviews over the phone, of which the first three went well, but I struggled a bit with the fourth. I applied
+to a handful of other similar firms and have not heard back from any of them.&lt;/p&gt;
+&lt;h3 id="difficulty-of-quant-programming-positions"&gt;Difficulty of quant programming positions&lt;/h3&gt;
+&lt;p&gt;For reference, they all required practically every math-related statistic about me they could before the interviews:
+my GPA is about 3.55 out of 4 at a top 20 school, I scored an 800 on the math part of the SAT, an 800 on the
+Math II SAT Subject Test, a 36 on the math part of the ACT, and a 168 out of 170 on the quantitative part of the
+GRE. All of this was required to submit an application to most firms. I applied to about 20 of these firms and
+was only approached by 1, so you have been warned! :-)&lt;/p&gt;
+&lt;h3 id="question"&gt;Question&lt;/h3&gt;
+&lt;p&gt;The first question was “&lt;strong&gt;given an input stream, how would you collect a k-sized evenly-distributed sample of
+the input?&lt;/strong&gt;”’&lt;/p&gt;
+&lt;h3 id="constraints-and-clarification"&gt;Constraints and clarification&lt;/h3&gt;
+&lt;p&gt;First, to answer these types of questions, you need to fully understand the question and all of the constraints. First,
+I asked about data types — are these numbers? are they objects? — and the interviewer told me it didn’t matter,
+but we could pretend they are integers for now and move to the general case later. Next, I asked about total size
+— my intuition first says that I need to know the size of the sample space in order to sample it. He said “input
+stream” is meant to be like an iterator — you just keep calling next() until it stops returning results —
+so you don’t know the total size of the set. I next asked “okay, so if we start at 0, we always know how many
+we have &lt;em&gt;at each step&lt;/em&gt;, right?” to which he answered, “yes.” At this point, I could restate the problem in a
+more explicit form: “Given an input stream of objects, how would you collect a k-sized evenly-distributed sample
+of the input, &lt;em&gt;so that at any point in time, you have a k-sized evenly distributed sample of the input &lt;strong&gt;so far.&lt;/strong&gt;&lt;/em&gt;”&lt;/p&gt;
+&lt;h3 id="how-to-start"&gt;How to start&lt;/h3&gt;
+&lt;p&gt;Next, I started typing out the code (we used a Google Docs-esque screen sharing thing to share coe). I knew that,
+given a constant K, I would always need to iterate through the first k items and add them to the sample. Based on
+the intuitive concept: If you have k items, then a k-sized sample includes all of the items.&lt;/p&gt;
+&lt;h3 id="inductive-step"&gt;Inductive step&lt;/h3&gt;
+&lt;p&gt;Next, the hard step: how do I determine whether or not the k+1'th item goes into the sample set or does not? If
+it does, which item does it replace?&lt;/p&gt;
+&lt;p&gt;It turns out, as long as we keep a running count of how many items we’ve seen so far, let’s say y, then we
+just need to roll a y-sided die to determine whether or not it goes in the sample. If you roll a 1, 2, …, or a
+k, then it goes in the sample. If you roll a k, k+1, …, y, it does not. If it goes in the sample, then you roll
+a k-sided die to determine the index of the element it replaces. This can then be proven to work inductively and
+thus answers the theoretical question. Programmatically, I implemented this with the Random class of Java.&lt;/p&gt;
+&lt;h3 id="concrete-example"&gt;Concrete Example&lt;/h3&gt;
+&lt;p&gt;Consider a 6-sized sample of natural numbers. We fill it at first with 1, 2, 3, 4, 5, and 6. Next we get a 7. We
+roll a 7-sided die (or in the program, we generate a random number from 1 to 7). We get a 5. Since 1 &amp;lt;= 5 &amp;lt;= 6,
+we put 7 in the sample. We roll a 6-sided die (generate a random number from 1 to 6). We get 4. So now we replace
+4 in the set, so our sample looks like {1, 2, 3, 7, 5, 6}.&lt;/p&gt;
+&lt;p&gt;1, 2, 3, 4, 5, and 6 all had a 100% chance to be in the sample. With the 7th item, they all need to have a 6/7
+chance of being in the sample for it to be evenly distributed. The roll for 7 makes sense, since it had a 6/7
+chance of being in the sample just based on its roll. Anything currently in the sample, in our case 4, now has a
+1/6 chance of not being in the sample. Thus, we get a (6/7)*(1/6)=1/7 chance of not being in the sample REGARDLESS
+of the result of the roll for 7, thus giving it a 6/7 chance of being in the sample, just like 7 has based on its roll.&lt;/p&gt;
+&lt;p&gt;Cool math, eh?&lt;/p&gt;</content><category term="mathematics"></category><category term="software development"></category></entry><entry><title>Pan Balancing Problem</title><link href="http://z11k.com/posts/2012/12/pan-balancing-problem/" rel="alternate"></link><published>2012-12-24T00:00:00-05:00</published><updated>2012-12-24T00:00:00-05:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2012-12-24:/posts/2012/12/pan-balancing-problem/</id><summary type="html">&lt;p&gt;I haven’t written anything interesting on here in a while, and I’ve recently been sharpening my algorithm
+design, algorithm analysis, and general math skills, so here is a short post on one of my favorite kinds of problems!&lt;/p&gt;
+&lt;h3 id="pan-balancing"&gt;Pan Balancing&lt;/h3&gt;
+&lt;p&gt;A pan balance is a balance with two …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I haven’t written anything interesting on here in a while, and I’ve recently been sharpening my algorithm
+design, algorithm analysis, and general math skills, so here is a short post on one of my favorite kinds of problems!&lt;/p&gt;
+&lt;h3 id="pan-balancing"&gt;Pan Balancing&lt;/h3&gt;
+&lt;p&gt;A pan balance is a balance with two pans suspended from either end of a rod with a pivot in the center. It can
+be used as a ternary operator to determine whether or not an object is heavier, lighter, or the same weight as
+another object. A fun mathematical brainteaser is determining the minimum number of weighings to find a certain
+element in a set, such as the heavy marble in a set of otherwise identical marbles.&lt;/p&gt;
+&lt;h3 id="optimality"&gt;Optimality&lt;/h3&gt;
+&lt;p&gt;Pan balancing can be viewed as a decision tree problem using ternary decision trees. For instance, the classical
+pan balance problem is:&lt;/p&gt;
+&lt;p&gt;You have a pan balance and 8 marbles. They are all identical, except that one is heavier than the other 7. How
+can you identify this marble in the fewest number of weighings?&lt;/p&gt;
+&lt;p&gt;Think about the decision tree for this problem, rather than the algorithm. There are 8 possible results that can
+occur: the first marble is the heavy one, the second marble is the heavy one, …, the eighth marble is the heavy
+one. This means our decision tree must have at least 8 leaves. We are using a pan balance, which means our decision
+tree is ternary, thus we have:&lt;/p&gt;
+&lt;p&gt;This equation must be solved for d, which is the number of decisions that must be made to get to a result (i.e. the
+fewest number of weighings).&lt;/p&gt;
+&lt;p&gt;Thus, we know that there must exist an optimal algorithm that can always solve this problem using only two
+decisions. Can you come up with that algorithm?&lt;/p&gt;
+&lt;h3 id="algorithm"&gt;Algorithm&lt;/h3&gt;
+&lt;p&gt;Sometimes deciding the algorithm can be tricky, but a possible way to start is to draw the tree and put each answer
+at a leaf, and work your way up. I drew the decision tree with forward knowledge of the answer so that our solution
+makes more sense, but this could be done with a full ternary tree of depth 2 and produce a valid result as well.&lt;/p&gt;
+&lt;p&gt;Our blank decision tree in Figure 1 has 8 leaves, and we fill in the possible end results in Figure 2. To make
+this make more sense, let’s add some meaning to the branching order. If the decision branches left, then the
+left pan was heavier. If the decision branches right, then the right pan was heavier. If the decision branches to
+the middle, then the pans were equal.&lt;/p&gt;
+&lt;p&gt;Our decision tree in Figure 3 shows the next level filled in with statements. Intuitively, this makes sense for
+results 1, 3, 4, 5, 6, and 8, but why does 1=3 imply 2 and 6=8 imply 7? This is the next step, as we could have
+switched 2 and 7’s positions in this tree and our deduction so far is still correct.  What do we know about the
+first decision from this? We know that based on the first decision, if the weighing branches to the left, the result
+must be 1, 2, or 3. Similarly, if it branches to the right, it must be 6, 7, or 8. If the two pans are equal, then
+the answer must be 4 or 5. What comparison can we do to first to guarantee all of these cases for the second level?&lt;/p&gt;
+&lt;p&gt;Figure 4 shows the correct decision for the first level, and thus completes our decision tree. Try picking any of the
+marbles to be the heavier marble and walking through the tree. You will always get the correct result in two weighings!&lt;/p&gt;
+&lt;h3 id="adding-complexity"&gt;Adding Complexity&lt;/h3&gt;
+&lt;p&gt;Now let’s imagine we have 8 coins, and at most one of them is bad, meaning it is either lighter or heavier than
+the other ones. How many weighings does it take to determine if one of the coins is bad? How many weighings does
+it take to determine which coin it is, and if it is heavier or lighter?&lt;/p&gt;
+&lt;p&gt;The first question should be simple. There are two possibilities, either one of the coins is bad, or they are all
+good! Putting 4 on one side and 4 on the other will answer this question! If they are equal, then there is no bad
+coin, but if they are not, then there must be a bad coin!&lt;/p&gt;
+&lt;p&gt;The second question is harder. What if we use our decision tree from the last problem. We weigh {1,2,3} against {4,5,6}
+and it branches left. We then weigh 1 against 3 and it branches to the middle. Does this mean 2 is our bad coin?&lt;/p&gt;
+&lt;p&gt;Not necessarily! What if 7 was lighter than the rest? Then {1,2,3} would branch left against {6,7,8} and 1 would
+branch to the middle against 3. This gives us an answer of 2 but that is clearly not the case!&lt;/p&gt;
+&lt;p&gt;How many different results are there in this case? Well, 1 could be lighter. 1 could also be heavier! The same
+for 2 through 8. Also, they could all be the same! This gives us 8 results for a light coin, 8 for a heavy coin,
+and 1 for the same! That is 17 possible results. Our 2-level decision tree can’t determine the answer for a
+question with 17 distinct possibilities! A 3-level ternary decision tree can though (why is this?)!&lt;/p&gt;
+&lt;p&gt;Figure 5 shows a much less intuitive filled-in decision tree for this problem. 1 means 1 is heavier, and 8’
+means 8 is lighter, while “x” means there is no bad coin. Since it has only 3 levels, we know it is an optimal
+algorithm. Can you derive a different optimal algorithm for this? How many coins at most could we test using only
+3 decisions? (i.e. could we do this with 9 coins? 10 coins? More?)&lt;/p&gt;
+&lt;p&gt;Bonus questions: How many decisions does an optimal algorithm take to identify at most 2 bad coins out of 36
+and their relative weights? How many decisions does an optimal algorithm take to identify 3 bad coins out of 36
+ignoring their weights? Are there situations where it takes n decisions to identify a single bad coin out of m
+coins ignoring their weights, as well as n decisions to identify a single bad coin out of m coins and determining
+its relative weight? (i.e. it takes just as many steps to determine the weight too as it does to ignore it)&lt;/p&gt;</content><category term="mathematics"></category><category term="needswork"></category></entry></feed>
