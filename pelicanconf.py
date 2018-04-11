@@ -61,7 +61,7 @@ LANDING_PAGE_ABOUT = {'title': 'Zach McCormick',
                                  'distributed systems, and software systems engineering. His main languages of choice '
                                  'are Python and Java, but has experience working on systems in JavaScript, '
                                  'Ruby, Groovy, and Scala as well.</p>'
-                                 '<p>He currently works for Appboy as a Senior Software Engineer, working with '
+                                 '<p>He currently works for Braze (formerly known as Appboy) as a Senior Software Engineer, working with '
                                  'technology like Ruby, Rails, Sidekiq, MongoDB, and more!</p>',
                       }
 PROJECTS = [
