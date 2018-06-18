@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta charset="utf-8"> 
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Zach McCormick" />
+        <meta name="copyright" content="Zach McCormick" />
+
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="software architecture, engineering management, teamwork, refactoring, change, Software Development, " />
+
+<meta property="og:title" content="Code Vision "/>
+<meta property="og:url" content="../../../../posts/2018/06/code-vision/" />
+<meta property="og:description" content="While I&#39;m currently on an early flight from Indianapolis to Newark, I&#39;d love to expound on some thoughts I&#39;ve had recently about what I call &#34;code vision&#34;. I define this as a written, iterated-on plan for what a codebase should look like in the future. This is different from what …" />
+<meta property="og:site_name" content="Thoughts and Discoveries of z11k" />
+<meta property="og:article:author" content="Zach McCormick" />
+<meta property="og:article:published_time" content="2018-06-18T00:00:00-04:00" />
+<meta name="twitter:title" content="Code Vision ">
+<meta name="twitter:description" content="While I&#39;m currently on an early flight from Indianapolis to Newark, I&#39;d love to expound on some thoughts I&#39;ve had recently about what I call &#34;code vision&#34;. I define this as a written, iterated-on plan for what a codebase should look like in the future. This is different from what …">
+
+        <title>Code Vision  · Thoughts and Discoveries of z11k
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/pygments.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/tipuesearch/tipuesearch.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/elegant.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/custom.css" media="screen">
+        <link href="http://z11k.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Thoughts and Discoveries of z11k - Full Atom Feed" />
+    </head>
+    <body>
+        <div id="content-sans-footer">
+        <div class="navbar navbar-static-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="../../../../"><span class=site-name>Thoughts and Discoveries of z11k</span></a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right top-menu">
+                            <li ><a href="../../../..">Home</a></li>
+                            <li ><a href="../../../../categories.html">Categories</a></li>
+                            <li ><a href="../../../../tags.html">Tags</a></li>
+                            <li ><a href="../../../../archives.html">Archives</a></li>
+                            <li><form class="navbar-search" action="../../../../search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span1"></div>
+                <div class="span10">
+<article>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+    <h1><a href="../../../../posts/2018/06/code-vision/"> Code Vision  </a></h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+
+            
+            <p>While I'm currently on an early flight from Indianapolis to Newark, I'd love to expound on
+some thoughts I've had recently about what I call "code vision". I define this as a written,
+iterated-on plan for what a codebase should look like in the future. This is different from
+what features are in the pipeline - think more of a big-picture, directional plan for the
+architecture. I believe that this holistic view is needed as a codebase accumulates age and
+a significant number of active developers, much like a past-startup-stage company needs
+vision and values. <em>I believe the process of refactoring to be largely ineffective without
+first having this vision</em>.</p>
+<p>As a former Boy Scout, I have heard the phrase "Try and leave this world a little better
+than you found it" by Robert Baden-Powell more times than I can count, and I try to remember
+it in many different contexts - code included. I think that this is easier to apply with
+nature and the outdoors - "better" is quite clear to us: reduce waste, don't pollute, and
+try not to disturb the wildlife. Software is a bit different, however, in that "better" is
+often a very subjective thing. Refactoring - the process of leaving the codebase a little
+better than you found it - can be quite aimless unless we have a common concept of "better".</p>
+<p>Imagine that you have a class that is ugly - it has one gigantic method. You break
+it up into a series of smaller functions that are easier to test, and call them procedurally
+from one "master" method or function. Your comments make it clearer what is going on, but
+ultimately the class performs the same function. If you have several classes with similar
+structure - one big method or several small, well-commented methods - all wired together
+without a class hierarchy or unifying framework, you've only put lipstick on a pig. Your
+system itself is still disorganized, so you find some commonalities between parts - say
+you are rendering HTML pages and you create a base <code>Controller</code> class to take care of
+authorization, or you are processing SQL-driven reports, so you create a <code>SqlReport</code>
+base class and rewrite several classes to use this new class hierarchy. Without a holistic
+vision, it's likely that the next person to work on rendering pages or generating reports
+will do their own thing or simply pattern match (i.e. copy, paste, and modify) without
+thinking about how their additions or changes fit into the greater picture. This leads to
+JSON API controllers using a base <code>Controller</code> class geared toward rendering HTML and
+large bits of transactional SQL statements using a <code>SqlReport</code> class geared toward
+asynchronous queries run on a read replica.</p>
+<p>I have worked at a number of companies, but most of them had relatively young codebases,
+with fewer than 20 or 30 developers and fewer than 5 years of history. I've had, however,
+the benefit of working on contracts or patent cases where I've been privy to much, much
+larger and older codebases as well, and have seen ones with clear and obvious vision, as
+well as ones without. Needless to say, the ones without were the least organized, the
+least understandable, and the hardest to understand. The ones with vision tended to share
+several common, positive values: <em>clarity, modularization, and simplicity</em>. Moreover,
+they tended to exhibit what I refer to as "<strong>framework-oriented thinking</strong>" - an
+architectural approach that favors frameworks written by architects and senior
+engineers with components and extensions built by everyone. These are inherently
+modular, and often were surprisingly simple and clear. One only had to read the docs
+for the major framework components - often base classes or abstract classes that
+made up a pipeline, a composite rendering framework, or a communication paradigm -
+in order to understand the big picture. From there, any individual components made
+sense. It is easy to understand the purpose and function of <code>FanOutPipelineTask</code> or
+<code>class ColoredButton extends Button (extends UIComponent)</code>, and one couldn't (without
+significant effort, anyway) try to shim a subclass of <code>SqlReport</code> to run on the
+write primary!</p>
+<p>New development aside, with this level of increased clarity and understanding, the process
+of refactoring changes from a cloudy, somewhat aimless task to one that has purpose and is
+rather easy to understand. With a code vision and "framework-oriented thinking", one can
+evaluate methods, classes, and components and ask themselves "does this component fit into
+the paradigm of the framework as is?" and if the answer is no, then ask "should this
+component change, or should the framework change?". Methods can still be divided into
+less complex sub-methods, but now classes and components can be changed with purpose - to
+better fit into the rest of the system. Code review changes as well - a reviewer can now
+ask "do these additions or changes fit in with the framework, or change the framework
+itself to better suit its purpose?" rather than simply "does this code function properly
+and is it tested appropriately?".</p>
+<p>I'd love to hear your thoughts on this concept. Shoot me an email at
+<a href="mailto:z@z11k.com">z@z11k.com</a> or find me on LinkedIn - I'm a sucker for organization
+and structure, but I love hearing the other side as well - maybe you have a good reason
+that such vision and structure hinders feature progress or is overly prescriptive. Let
+me know and let's discuss to make the software world a better place!</p>
+            
+            
+            <hr/>
+        </div>
+        <section>
+        <div class="span2" style="float:right;font-size:0.9em;">
+            <h4>Published</h4>
+            <time pubdate="pubdate" datetime="2018-06-18T00:00:00-04:00">Jun 18, 2018</time>
+            <h4>Category</h4>
+            <a class="category-link" href="../../../../categories.html#software-development-ref">Software Development</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="../../../../tags.html#change-ref">change
+                    <span>2</span>
+</a></li>
+                <li><a href="../../../../tags.html#engineering-management-ref">engineering management
+                    <span>4</span>
+</a></li>
+                <li><a href="../../../../tags.html#refactoring-ref">refactoring
+                    <span>1</span>
+</a></li>
+                <li><a href="../../../../tags.html#software-architecture-ref">software architecture
+                    <span>1</span>
+</a></li>
+                <li><a href="../../../../tags.html#teamwork-ref">teamwork
+                    <span>2</span>
+</a></li>
+            </ul>
+        </div>
+        </section>
+</div>
+</article>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
+        <div id="push"></div>
+    </div>
+<footer>
+<div id="footer">
+    <ul class="footer-content">
+        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="http://oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="http://oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
+    </ul>
+</div>
+</footer>            <script src="http://code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    
+    </body>
+    <!-- Theme: Elegant built for Pelican
+    License : http://oncrashreboot.com/pelican-elegant -->
+</html>
