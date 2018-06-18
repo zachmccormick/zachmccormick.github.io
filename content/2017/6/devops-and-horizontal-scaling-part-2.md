@@ -101,7 +101,7 @@ functionality — they can just start coding features and fixing bugs in their f
 
 Careful planning and working with the engineering team and outside product owners/users is critical to implementing
 these steps successfully. This is actually something that I love to consult with companies about — shoot me an
-e-mail at [zach@trailblazingtech.com](mailto:zach@trailblazingtech.com) to get a bit more information about that. I
+e-mail at [z@z11k.com](mailto:z@z11k.com) to get a bit more information about that. I
 love traveling and will gladly come to you wherever you are to help your company succeed in implementing these tools.
 
 ## What next?
