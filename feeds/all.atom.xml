@@ -229,7 +229,7 @@ planning or a round of refactoring first.&lt;/p&gt;
 &lt;h3 id="how-do-you-do-it"&gt;How do you do it?&lt;/h3&gt;
 &lt;p&gt;As I mentioned in the last post: careful planning and working with the engineering team and outside product
 owners/users is critical to implementing these steps successfully. This is actually something that I love to consult
-with companies about — shoot me an e-mail at &lt;a href="mailto:zach@trailblazingtech.com"&gt;zach@trailblazingtech.com&lt;/a&gt; to
+with companies about — shoot me an e-mail at &lt;a href="mailto:z@z11k.com"&gt;z@z11k.com&lt;/a&gt; to
 get a bit more information about that. I love traveling and will gladly come to you wherever you are to help your
 company succeed in implementing these tools.&lt;/p&gt;</content><category term="software development"></category><category term="engineering management"></category><category term="teams"></category><category term="tools"></category></entry><entry><title>DevOps and Horizontal Scaling: Part 2</title><link href="http://z11k.com/posts/2017/06/devops-and-horizontal-scaling-part-2/" rel="alternate"></link><published>2017-06-29T00:00:00-04:00</published><updated>2017-06-29T00:00:00-04:00</updated><author><name>Zach McCormick</name></author><id>tag:z11k.com,2017-06-29:/posts/2017/06/devops-and-horizontal-scaling-part-2/</id><summary type="html">&lt;p&gt;Lets talk about the first 3 of the 7 tools I described in the last post!&lt;/p&gt;
 &lt;h2 id="product-management-involving-feature-flags-switches-and-samples"&gt;Product Management involving feature flags, switches, and samples&lt;/h2&gt;
@@ -311,7 +311,7 @@ functionality — they can just start coding features and fixing bugs in their f
 &lt;h2 id="how-do-you-do-it"&gt;How do you do it?&lt;/h2&gt;
 &lt;p&gt;Careful planning and working with the engineering team and outside product owners/users is critical to implementing
 these steps successfully. This is actually something that I love to consult with companies about — shoot me an
-e-mail at &lt;a href="mailto:zach@trailblazingtech.com"&gt;zach@trailblazingtech.com&lt;/a&gt; to get a bit more information about that. I
+e-mail at &lt;a href="mailto:z@z11k.com"&gt;z@z11k.com&lt;/a&gt; to get a bit more information about that. I
 love traveling and will gladly come to you wherever you are to help your company succeed in implementing these tools.&lt;/p&gt;
 &lt;h2 id="what-next"&gt;What next?&lt;/h2&gt;
 &lt;p&gt;In my next post, I’ll go over the last 4 tools to implementing a DevOps culture to enable Horizontal Scaling
