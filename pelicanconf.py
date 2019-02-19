@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 # ############## General Settings #################
 AUTHOR = 'Zach McCormick'
-SITENAME = "Thoughts and Discoveries of z11k"
+SITENAME = "Zach McCormick's Personal Blog"
 SITEURL = 'http://z11k.com'
 DESCRIPTION = 'My blog and stuff ...'
 TIMEZONE = 'America/New_York'
@@ -85,3 +85,6 @@ PROJECTS = [
         'description': 'Adds AJAX-powered select fields to Django in a DRY way.',
     },
 ]
+
+TWITTER_USERNAME = "zachmccormick"
+GOOGLE_ANALYTICS = "UA-134718312-1"
