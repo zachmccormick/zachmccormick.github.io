@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 # ############## General Settings #################
 AUTHOR = 'Zach McCormick'
 SITENAME = "Zach McCormick's Personal Blog"
-SITEURL = 'http://z11k.com'
+SITEURL = 'https://z11k.com'
 DESCRIPTION = 'My blog and stuff ...'
 TIMEZONE = 'America/New_York'
 # TODO come up with a better tagline

@@ -50,7 +50,7 @@ In urls.py, change **from django.contrib import admin** to **from django.contrib
 
 ### Credits
 
-[cyberdelia](http://twitter.com/cyberdelia) and [dschep](http://twitter.com/dschep) on GitHub for helping provide
+[cyberdelia](https://twitter.com/cyberdelia) and [dschep](https://twitter.com/dschep) on GitHub for helping provide
 and work through the gdal dependency issues with a custom buildpack.
 
 ### GitHub Example

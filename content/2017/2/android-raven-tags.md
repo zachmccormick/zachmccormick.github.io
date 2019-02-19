@@ -25,7 +25,7 @@ I ended up doing the following, which hopefully helps others!
       final NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
       final PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);;
       raven.addBuilderHelper(new EventBuilderHelper() {
-          [@Override](http://twitter.com/Override)
+          @Override
           public void helpBuildingEvent(EventBuilder eventBuilder) {
             eventBuilder.withTag("wifi", String.valueOf(mWifi.isConnected()));
             eventBuilder.withTag("app_version", pInfo.versionName);
