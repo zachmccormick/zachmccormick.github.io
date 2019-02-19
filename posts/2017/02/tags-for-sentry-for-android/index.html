@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
-        <meta charset="utf-8"> 
+        <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="author" content="Zach McCormick" />
@@ -30,7 +30,7 @@
         <link rel="stylesheet" type="text/css" href="../../../../theme/tipuesearch/tipuesearch.css" media="screen">
         <link rel="stylesheet" type="text/css" href="../../../../theme/css/elegant.css" media="screen">
         <link rel="stylesheet" type="text/css" href="../../../../theme/css/custom.css" media="screen">
-        <link href="http://z11k.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Zach McCormick&#39;s Personal Blog - Full Atom Feed" />
+        <link href="https://z11k.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Zach McCormick&#39;s Personal Blog - Full Atom Feed" />
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134718312-1"></script>
 <script>
@@ -99,7 +99,7 @@ inconsistent across manufacturers, devices, Android versions, etc.)</p>
   <span class="n">final</span> <span class="n">NetworkInfo</span> <span class="n">mWifi</span> <span class="o">=</span> <span class="n">connManager</span><span class="o">.</span><span class="n">getNetworkInfo</span><span class="p">(</span><span class="n">ConnectivityManager</span><span class="o">.</span><span class="n">TYPE_WIFI</span><span class="p">);</span>
   <span class="n">final</span> <span class="n">PackageInfo</span> <span class="n">pInfo</span> <span class="o">=</span> <span class="n">getPackageManager</span><span class="p">()</span><span class="o">.</span><span class="n">getPackageInfo</span><span class="p">(</span><span class="n">getPackageName</span><span class="p">(),</span> <span class="mi">0</span><span class="p">);;</span>
   <span class="n">raven</span><span class="o">.</span><span class="n">addBuilderHelper</span><span class="p">(</span><span class="n">new</span> <span class="n">EventBuilderHelper</span><span class="p">()</span> <span class="p">{</span>
-      <span class="p">[</span><span class="nd">@Override</span><span class="p">](</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">twitter</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">Override</span><span class="p">)</span>
+      <span class="nd">@Override</span>
       <span class="n">public</span> <span class="n">void</span> <span class="n">helpBuildingEvent</span><span class="p">(</span><span class="n">EventBuilder</span> <span class="n">eventBuilder</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">eventBuilder</span><span class="o">.</span><span class="n">withTag</span><span class="p">(</span><span class="s2">&quot;wifi&quot;</span><span class="p">,</span> <span class="n">String</span><span class="o">.</span><span class="n">valueOf</span><span class="p">(</span><span class="n">mWifi</span><span class="o">.</span><span class="n">isConnected</span><span class="p">()));</span>
         <span class="n">eventBuilder</span><span class="o">.</span><span class="n">withTag</span><span class="p">(</span><span class="s2">&quot;app_version&quot;</span><span class="p">,</span> <span class="n">pInfo</span><span class="o">.</span><span class="n">versionName</span><span class="p">);</span>
@@ -152,10 +152,10 @@ the Android version of Raven, but reflection saves the day per usual.</p>
 <footer>
 <div id="footer">
     <ul class="footer-content">
-        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="http://oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="http://oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
+        <li class="elegant-power">Powered by <a href="//getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="//oncrashreboot.com/pelican-elegant" title="Theme Elegant Home Page">Elegant</a> by <a href="//oncrashreboot.com" title="Talha Mansoor Home Page">Talha Mansoor</a></li>
     </ul>
 </div>
-</footer>            <script src="http://code.jquery.com/jquery.min.js"></script>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
         <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
         <script>
             function validateForm(query)
@@ -166,6 +166,4 @@ the Android version of Raven, but reflection saves the day per usual.</p>
 
     
     </body>
-    <!-- Theme: Elegant built for Pelican
-    License : http://oncrashreboot.com/pelican-elegant -->
 </html>
