@@ -88,3 +88,7 @@ PROJECTS = [
 
 TWITTER_USERNAME = "zachmccormick"
 GOOGLE_ANALYTICS = "UA-134718312-1"
+
+PLUGIN_PATH = 'plugins'
+PLUGINS = ['tipue_search', 'sitemap']
+DIRECT_TEMPLATES = ['index', 'tags', 'categories', 'authors', 'archives', 'search']
