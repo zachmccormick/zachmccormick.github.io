@@ -9,7 +9,16 @@
         <meta name="twitter:creator" content="@zachmccormick">
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary">
-        <title>Zach McCormick's Personal Blog - Authors</title>
+
+<meta property="og:title" content="Search · Zach McCormick&#39;s Personal Blog"/>
+<meta name="twitter:title" content="Search · Zach McCormick&#39;s Personal Blog">
+<meta property="og:url" content="./search.html" />
+<meta property="og:description" content="Search results for Zach McCormick&#39;s Personal Blog blog" />
+<meta name="twitter:description" content="Search results for Zach McCormick&#39;s Personal Blog blog">
+<meta property="og:site_name" content="Zach McCormick&#39;s Personal Blog" />
+<meta property="og:article:author" content="Zach McCormick" />
+        <title>Search · Zach McCormick&#39;s Personal Blog
+</title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="./theme/css/pygments.css" media="screen">
@@ -57,10 +66,11 @@
             <div class="row-fluid">
                 <div class="span1"></div>
                 <div class="span10">
-    <h1>Authors on Zach McCormick's Personal Blog</h1>
-
-    <ul>        <li><a href="./author/zach-mccormick.html">Zach McCormick</a> (20)</li>
-    </ul>
+<article>
+    <div class="span8 offset2">
+        <div id="tipue_search_content"><div id="tipue_search_loading"></div></div>
+    </div>
+</article>
                 </div>
                 <div class="span1"></div>
             </div>
@@ -73,14 +83,21 @@
         <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="https://github.com/Pelican-Elegant/elegant/" title="Theme Elegant Home Page">Elegant</a></li>
     </ul>
 </div>
-</footer>        <script src="//code.jquery.com/jquery.min.js"></script>
-        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-        <script>
-            function validateForm(query)
-            {
-                return (query.length > 0);
-            }
-        </script>
+</footer><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script type="text/javascript" src="./theme/tipuesearch/tipuesearch_set.js"></script>
+<script type="text/javascript" src="./theme/tipuesearch/tipuesearch.min.js"></script>
+
+<script src="./tipuesearch_content.js"></script>
+
+<script>
+$(document).ready(function() {
+     $('#tipue_search_input').tipuesearch({
+             'mode' : 'json',
+         'show': 10,
+         'newWindow': false,
+     });
+});
+</script>
     </body>
     <!-- Theme: Elegant built for Pelican
     License : MIT -->
