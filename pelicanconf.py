@@ -55,29 +55,34 @@ MARKDOWN = {
 # Random theme settings
 
 LANDING_PAGE_ABOUT = {'title': 'Zach McCormick',
-                      'details': '<p>Zach graduated from Vanderbilt University with a BS in Computer Science and '
-                                 'Mathematics in 2013. He has worked for a number of companies both as a FTE and '
-                                 'consultant/contractor, and specializes in web applications, mobile applications, '
-                                 'distributed systems, and software systems engineering. His main languages of choice '
-                                 'are Python and Java, but has experience working on systems in JavaScript, '
-                                 'Ruby, Groovy, and Scala as well.</p>'
-                                 '<p>He currently works for Braze (formerly known as Appboy) as a Senior Software Engineer, working with '
-                                 'technology like Ruby, Rails, Sidekiq, MongoDB, and more!</p>',
+                      'details': '<p>Zach is a software engineer and manager passionate about building and maintaining global-scale distributed systems. '
+                                 'He has experience with distributed systems, web applications, and mobile applications across a variety of industries, '
+                                 'including marketing automation, fintech, IoT, healthcare, and mobile cybersecurity, as well as across a variety of '
+                                 'languages and technologies, including Python, Java, JavaScript, Ruby, PostgreSQL, MySQL, MongoDB, Redis, and '
+                                 'others. He currently works for Braze managing the engineering team behind Canvas, a workflow engine for marketing '
+                                 'automation that is responsible for orchestrating hundreds of millions of messages per day.</p>'
                       }
 PROJECTS = [
     {
-        'name': 'Django Heroku Template',
-        'url': 'https://github.com/TrailblazingTech/django-heroku-template',
+        'name': 'Django on Heroku',
+        'url': 'https://github.com/ColossusInnovation/django-on-heroku',
         'description': 'Template for developing modern Django applications on Heroku '
                        'using Redis and Postgres for data stores and queues, and '
                        'using Celery for asynchronous tasks.',
     },
     {
-        'name': 'Django GIS Heroku Template',
-        'url': 'https://github.com/TrailblazingTech/django-gis-heroku',
+        'name': 'Django GIS on Heroku',
+        'url': 'https://github.com/ColossusInnovation/django-gis-on-heroku',
         'description': 'A guide and template for using GeoDjango - a Django '
                        'configuration with GIS support. This template also uses '
                        'Redis, Postgres, and Celery.',
+    },
+    {
+        'name': 'Django React Multi-Page on Heroku',
+        'url': 'https://github.com/ColossusInnovation/django-react-multi-page-on-heroku',
+        'description': 'A template for combining Django with React by rendering individual '
+                       'applications as Django pages (with initial state provided by the view). '
+                       'Uses Redis, Postgres, and Celery.',
     },
     {
         'name': 'Django Related Select',
