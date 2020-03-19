@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Zach McCormick" />
+
+        <meta name="twitter:creator" content="@zachmccormick">
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="software architecture, job queues, design patterns, architecture patterns, Software Development, " />
+
+<meta property="og:title" content="Achieving Resiliency With Queues: Building A System That Never Skips A Beat In A Billion "/>
+<meta property="og:url" content="../../../../posts/2018/12/achieving-resiliency-with-queues-building-a-system-that-never-skips-a-beat-in-a-billion/" />
+<meta property="og:description" content="Braze processes billions and billions of events per day on behalf of its customers, resulting in billions of hyper-focused, personalized messages—but failing to send one of those messages has consequences. To make sure those key messages are always correct and always on time, Braze takes a strategic approach to …" />
+<meta property="og:site_name" content="Zach McCormick&#39;s Personal Blog" />
+<meta property="og:article:author" content="Zach McCormick" />
+<meta property="og:article:published_time" content="2018-12-20T00:00:00-05:00" />
+<meta name="twitter:title" content="Achieving Resiliency With Queues: Building A System That Never Skips A Beat In A Billion ">
+<meta name="twitter:description" content="Braze processes billions and billions of events per day on behalf of its customers, resulting in billions of hyper-focused, personalized messages—but failing to send one of those messages has consequences. To make sure those key messages are always correct and always on time, Braze takes a strategic approach to …">
+
+        <title>Achieving Resiliency With Queues: Building A System That Never Skips A Beat In A Billion  · Zach McCormick&#39;s Personal Blog
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/pygments.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/tipuesearch/tipuesearch.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/elegant.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/admonition.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="../../../../theme/css/custom.css" media="screen">
+        <link href="https://z11k.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Zach McCormick&#39;s Personal Blog - Full Atom Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-134718312-1', 'auto');
+    ga('send', 'pageview');
+</script>
+
+
+
+    </head>
+    <body>
+        <div id="content-sans-footer">
+        <div class="navbar navbar-static-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="../../../../"><span class=site-name>Zach McCormick's Personal Blog</span></a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav pull-right top-menu">
+                            <li ><a href="../../../..">Home</a></li>
+                            <li ><a href="../../../../categories">Categories</a></li>
+                            <li ><a href="../../../../tags">Tags</a></li>
+                            <li ><a href="../../../../archives">Archives</a></li>
+                            <li><form class="navbar-search" action="../../../../search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span1"></div>
+                <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+    <h1><a href="../../../../posts/2018/12/achieving-resiliency-with-queues-building-a-system-that-never-skips-a-beat-in-a-billion/"> Achieving Resiliency With Queues: Building A System That Never Skips A Beat In A Billion  </a></h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+
+            
+            <p>Braze processes billions and billions of events per day on behalf of its customers, resulting in billions
+of hyper-focused, personalized messages—but failing to send one of those messages has consequences. To make
+sure those key messages are always correct and always on time, Braze takes a strategic approach to how we
+leverage job queues.</p>
+<h2 id="whats-a-job-queue">What’s a Job Queue?</h2>
+<p>A typical job queue is an architectural pattern where processes submit computation jobs to a queue and
+other processes actually execute the jobs. This is usually a good thing—when used properly, it gives you
+degrees of concurrency, scalability, and redundancy that you can’t get with a traditional request–response
+paradigm. Many workers can be executing different jobs simultaneously in multiple processes, multiple
+machines, or even multiple data centers for peak concurrency. You can assign certain worker nodes to work
+on certain queues and send particular jobs to specific queues, allowing you to scale resources as needed.
+If a worker process crashes or a data center goes offline, other workers can execute the remaining jobs.</p>
+<p>While you can certainly apply these principles and run a job-queueing system easily at a small scale, the
+seams start to show (and even burst) when you’re processing billions and billions of jobs. Let’s take a
+look at a few problems Braze has faced as we’ve grown from processing thousands, to millions, and now
+billions of jobs per day.</p>
+<p>Check out the rest of this blog post at <a href="https://www.braze.com/perspectives/article/building-braze-job-queues-resiliency">Building Braze</a>!</p>
+<!-- COMMENTED OUT TO DRIVE TRAFFIC TO BRAZE
+## Lack of Consistency Is a Weakness
+
+What happens if we send a message, but we crash before recording the fact that we just sent that message?
+
+A couple different bad outcomes are possible here. First, you might reschedule the failed job and send the message again. That’s…not ideal: no one wants to receive the same thing twice. Instead, consider not rescheduling it at all. In that case, our internal accounting will be incorrect, so attributions, conversions, and all kinds of other things won’t be right moving forward.
+
+How do we fix that? When writing our job definitions, we think really hard about idempotency and retry behavior.
+
+When you’re talking about queues, idempotency means that a single job can be terminated at an arbitrary point, the re-queued job reran in its entirety, and the end result will be the same as if we had successfully run the job exactly one time. This is intimately tied to our retry behavior of choice—at-least-once delivery. By keeping in mind that all of our jobs will be run at least once, and maybe multiple times, we can write idempotent job definitions that ensure consistency even in the face of random failures.
+
+Going back to our message-sending example, how might we use these concepts to ensure consistency? In this case, we might break the job into two pieces, with the first one sending the message and enqueuing the second one, and the second one writing to the database. In that scenario, we can retry either job as many times as we want—if the message-sending provider is down, or the internal accounting database is down, we’ll appropriately retry until we succeed!
+
+![](resiliency-1.jpg)
+
+## Good Fences Make Good Neighbors
+
+What happens to our example company Consolidated Widgets’ data processing when the database for Global Gizmos is down?
+
+In this scenario, if our at-least-once delivery strategy is in play, we would expect all of the data-processing jobs for Global Gizmos to retry over and over until they succeed. This is great—we won’t lose any data even while their database is down. For Consolidated Widgets, however, it may not be that great: if the workers are constantly retrying and failing, they might be too busy to process Consolidated Widgets’ work in a timely fashion.
+
+We can fix this by using well-chosen queue names and pausing certain queues as needed. With this in our toolbelt, we can relieve the strain on pieces of infrastructure in a surgical manner. In our scenario above, once we know that Global Gizmos’ database is down, we can pause their data processing queue until we know it’s back up, ensuring that one specific outage doesn’t impact any other customers!
+
+![](resiliency-2.jpg)
+
+## Waiting Is Painful
+
+What if Consolidated Widgets and Global Gizmos send email campaigns to 50 million users each, 5 minutes apart? Who goes first?
+
+Simple job-queuing systems have a simple "work" queue that workers pull jobs from. Once you have a nice variety of different jobs and job types, you probably move on to having multiple types of queues, each having different priorities or types of workers pulling from those queues. In that vein, we have a variety of simple queues for data processing, messaging, and various maintenance tasks.
+
+Fast-forward to when you're sending billions of personalized messages per day, one "messaging" queue isn't going to cut it—what happens when that queue grows extremely large, like in our example above? Do we prioritize the jobs that arrived first?
+
+Our dynamic queueing system seeks to address a phenomenon called job starvation, where a job that is ready to execute waits for a long time before executing, usually because of some kind of priority. In a simple "messaging" queue, the priority is simply the time the job entered the queue, meaning that jobs added to the end of a big queue can end up waiting for a very long time.
+
+When we go to queue up a campaign and all of its messages, instead of adding the jobs to a big "messaging" queue, we create a totally new queue for just this campaign, complete with a special name so we know what it is and how to find it. After adding the jobs to the queue, we grab our “dynamic queues” list and add this new queue name to the end.
+
+By employing this strategy, we can instruct workers to pick up the name of a dynamic queue from the “dynamic queues” list, then process all of the jobs on that particular queue. This lets us ensure that messages are being sent as fast as possible AND that all of our customers are being treated with equal priority.
+
+Consequently, this has other benefits, like higher cache hit rates and fewer database connections, because of the increase in work locality for particular workers. Everybody wins!
+
+![](resiliency-3.jpg)
+
+## Always Have a Backup Plan
+
+What happens when a database is down, some queues are paused, and the job queues start to fill up?
+
+Sometimes important pieces of infrastructure simply die on you. We have secondaries and backups in place, but the time it takes to promote backup infrastructure is almost never zero. Having multiple layers of queues across the entire application infrastructure can be very helpful in mitigating the impact of these types of events.
+
+One such strategy we employ is queueing on devices themselves. Millions and millions of devices have different applications using a Braze SDK, and in those applications, we utilize a queue for sending data to our APIs.
+
+When our SDK goes to submit that data and fails, for whatever reason, the SDK queues up a retry using an exponential backoff algorithm until it succeeds. This strategy minimizes the impact of infrastructure or code failures, since devices will simply queue up their own data and send it to Braze when everything is back online.
+
+![](resiliency-4.jpg)
+
+## Moving Fast and Not Breaking Things
+
+At the end of the day, our goal is to send hyper-focused, personalized messages better than anyone else, and that involves moving quickly, being resilient, and getting everything right. Job queues are at the heart of Braze’s infrastructure, so we’re always watching our performance, employing best practices, and experimenting with new strategies and advanced techniques to be the best in the game.
+
+If this type of high-performance, low-latency systems engineering in the marketing automation space excites you, then you should definitely check our job board!
+-->
+            <div>
+</div>
+
+            
+            
+            <hr/>
+        </div>
+        <section>
+        <div class="span2" style="float:right;font-size:0.9em;">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2018-12-20T00:00:00-05:00">Dec 20, 2018</time>
+            <h4>Category</h4>
+            <a class="category-link" href="../../../../categories.html#software-development-ref">Software Development</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="../../../../tags#architecture-patterns-ref">architecture patterns
+                    <span>2</span>
+</a></li>
+                <li><a href="../../../../tags#design-patterns-ref">design patterns
+                    <span>2</span>
+</a></li>
+                <li><a href="../../../../tags#job-queues-ref">job queues
+                    <span>1</span>
+</a></li>
+                <li><a href="../../../../tags#software-architecture-ref">software architecture
+                    <span>3</span>
+</a></li>
+            </ul>
+        </div>
+        </section>
+</div>
+</article>
+                </div>
+                <div class="span1"></div>
+            </div>
+        </div>
+        <div id="push"></div>
+    </div>
+<footer>
+<div id="footer">
+    <ul class="footer-content">
+        <li class="elegant-power">Powered by <a href="http://getpelican.com/" title="Pelican Home Page">Pelican</a>. Theme: <a href="https://github.com/Pelican-Elegant/elegant/" title="Theme Elegant Home Page">Elegant</a></li>
+    </ul>
+</div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    
+    </body>
+    <!-- Theme: Elegant built for Pelican
+    License : MIT -->
+</html>

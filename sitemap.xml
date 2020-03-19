@@ -5,29 +5,43 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://z11k.com/</loc>
-<lastmod>2020-03-10T23:03:28-00:00</lastmod>
+<lastmod>2020-03-19T08:06:49-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://z11k.com/archives.html</loc>
-<lastmod>2020-03-10T23:03:28-00:00</lastmod>
+<lastmod>2020-03-19T08:06:49-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://z11k.com/tags.html</loc>
-<lastmod>2020-03-10T23:03:28-00:00</lastmod>
+<lastmod>2020-03-19T08:06:49-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>https://z11k.com/categories.html</loc>
-<lastmod>2020-03-10T23:03:28-00:00</lastmod>
+<lastmod>2020-03-19T08:06:49-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://z11k.com/posts/2019/06/connected-content-and-the-slashdot-effect-or-how-i-learned-to-scale-apis/</loc>
+<lastmod>2019-06-20T00:00:00-04:00</lastmod>
+<changefreq>monthly</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://z11k.com/posts/2018/12/achieving-resiliency-with-queues-building-a-system-that-never-skips-a-beat-in-a-billion/</loc>
+<lastmod>2018-12-20T00:00:00-05:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -194,7 +208,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://z11k.com/category/software-development.html</loc>
-<lastmod>2018-06-18T00:00:00-04:56</lastmod>
+<lastmod>2019-06-20T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -228,8 +242,8 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>https://z11k.com/tag/django.html</loc>
-<lastmod>2017-08-16T00:00:00-04:56</lastmod>
+<loc>https://z11k.com/tag/teams.html</loc>
+<lastmod>2017-07-25T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -284,6 +298,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
+<loc>https://z11k.com/tag/architecture-patterns.html</loc>
+<lastmod>2019-06-20T00:00:00-04:56</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
 <loc>https://z11k.com/tag/heroku.html</loc>
 <lastmod>2017-08-16T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
@@ -314,6 +335,20 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>https://z11k.com/tag/life.html</loc>
 <lastmod>2018-03-02T00:00:00-04:56</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://z11k.com/tag/job-queues.html</loc>
+<lastmod>2018-12-20T00:00:00-04:56</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>https://z11k.com/tag/proverbs.html</loc>
+<lastmod>2018-01-02T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -362,7 +397,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://z11k.com/tag/software-architecture.html</loc>
-<lastmod>2018-06-18T00:00:00-04:56</lastmod>
+<lastmod>2019-06-20T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -375,6 +410,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
+<loc>https://z11k.com/tag/api-design.html</loc>
+<lastmod>2019-06-20T00:00:00-04:56</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
 <loc>https://z11k.com/tag/change.html</loc>
 <lastmod>2018-06-18T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
@@ -382,8 +424,8 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>https://z11k.com/tag/proverbs.html</loc>
-<lastmod>2018-01-02T00:00:00-04:56</lastmod>
+<loc>https://z11k.com/tag/design-patterns.html</loc>
+<lastmod>2019-06-20T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -417,8 +459,8 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>https://z11k.com/tag/teams.html</loc>
-<lastmod>2017-07-25T00:00:00-04:56</lastmod>
+<loc>https://z11k.com/tag/django.html</loc>
+<lastmod>2017-08-16T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -460,7 +502,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>https://z11k.com/author/zach-mccormick.html</loc>
-<lastmod>2018-06-18T00:00:00-04:56</lastmod>
+<lastmod>2019-06-20T00:00:00-04:56</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
